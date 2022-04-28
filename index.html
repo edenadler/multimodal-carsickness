@@ -3,15 +3,81 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
     <title>Face Detection</title>
+
+    <script src="lib/three.min.js"></script>
+    <script src="facemesh.js"></script>
+    <!-- <script src="headangles.js"></script> -->
+    <!-- <script>
+      document.addEventListener("DOMContentLoaded", function(event) {
+         console.log("DOM fully loaded and parsed");
+         main();
+      });
+    </script> -->
+    
+    <script src="lib/dat.gui.min.js"></script>
+    <script src="lib/OrbitControls.js"></script>
+    <script src="js/ThinFilmFresnelMap.js"></script>
+    <script src="js/IridescentMaterial.js"></script>
+    <script src="js/SkyboxMaterial.js"></script>
+    <!-- <script src="example.js"></script> -->
   </head>
   <body>
     <!-- <div class="indicatorDot" style="left:30%; top:30%; width: 30px; height: 30px; background-color: red; border-radius: 50%; position: fixed;"></div> -->
+    <div id="webglcontainer"></div>
+    <div id="errorContainer" class="vAligned hidden">
+        <h1>Sorry!</h1>
+        <p>It seems your browser doesn't support WebGL!</p>
+    </div>
+
+    <div id="headtrackstuff">
+                <!-- <p id="RPY"></p> -->
+        <canvas hidden id="eyecache"></canvas>
+        <canvas hidden id="facecanvas"></canvas>
+
+        <!-- <p id="facemesh_fps"></p> -->
+        <!-- <p id="eye_coords"></p> -->
+
+        <!-- <video autoplay muted playsinline id="headvideo"  style="
+                  -webkit-transform: scaleX(-1);
+                  transform: scaleX(-1);
+                  visibility: hidden;
+                  width: auto;
+                  height: auto;
+                  ">
+                </video> -->
+    </div>
+    
     <video id="video" autoplay style="display: none"></video>
     <div style="width: 300px; height: 100%; position: relative;">
         <canvas id="canvas" width="300px" height="200px"></canvas>
-        <div style="width: 300px; height: 100%; position: relative;">
+        <div class="input-options">
+          <div class="container">
+            <div class="slider">
+              <div>Sensitivity</div>
+              <input id="slider-range" type="range" min="0" max="100" onchange="rangevalue.value=value"/>
+              <output id="rangevalue">50</output>
+            </div>
+          </div>
+
+          <div class="toggle-input">
+            <!-- <div class="toggle">
+              <input type="checkbox" id="checktoggle"/>
+              <div style="color: black;">Z axis rotation? </div>
+              <label for="checktoggle"></label>
+            </div> -->
+            <div>show z axis rotation?</div>
+            <label class="switch">
+              <input type="checkbox" id="checkbox-toggle" onchange="toggleResult.value=checked">
+              <span class="slider-toggle round"></span>
+            </label>
+            <output id="toggleResult">false</output>
+          </div>
+        </div>
+
+        <!-- <div style="width: 300px; height: 100%; position: relative;">
             QS World University Rankings rates MIT No. 1 in 12 subjects for 2022
         The Institute also ranks second in two subject areas.
         MIT News Office
@@ -61,10 +127,9 @@
         Twitter announced Tuesday that it would soon be testing editable tweets through Twitter Blue, its premium subscription service. Between the change to embedded tweets and that controversial news, the company seems to be moving toward a philosophy that puts its users’ intentions first, well above any concerns around archiving historical content. But the feature’s critics argue that giving users free rein to change their tweets after the fact could worsen some of Twitter’s most intractable platform problems, including harassment and misinformation.
         
         Much like public reception of the once-mythological edit tweet button, people are likely to be split on if Twitter deleting bits of the internet’s collective memory is a good move or an ominous step in the wrong direction. There’s a natural tension between the ethos of the “right to be forgotten” movement, which seeks to empower people to have certain kinds of content about them deleted from the internet, and the researchers, developers and other open information advocates that view the web as a living document — one to be updated constantly but never altered outright.
-        </div>
+        </div> -->
     </div>
-    <!-- <object id="static-text" data="https://www.theverge.com/2022/4/6/23012913/twitter-tweet-embeds-deleted-tweets-empty-iframe-broken" type="text/html" style="position: absolute; height: 100px; width: 100px; font-size: 24px; transition: top 0.1s linear, right 0.1s linear;"></object> -->
-    <div id="static-text" style="position: absolute; height: 100px; width: 100px; font-size: 24px; transition: top 0.1s linear, right 0.1s linear;">
+    <div id="static-text" style="position: absolute; height: 100px; width: 100px; font-size: 24px; transition: top 0.1s linear, right 0.1s linear; transform 0.1s linear;">
         QS World University Rankings rates MIT No. 1 in 12 subjects for 2022
 The Institute also ranks second in two subject areas.
 MIT News Office
