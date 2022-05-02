@@ -51,15 +51,22 @@ chrome.storage.local.get('camAccess', items => {
 const detectFaces = async () => {
     // console.log('detectFaces called');
     const prediction = await model.estimateFaces(video, false);
+
+    // initialize prediction values if not yet set
+    chrome.storage.local.get('recentPrediction', items => {
+        if (!'recentPrediction' in items) {
+            chrome.storage.local.set({'recentPrediction': pred});
+        }
+    });
     
     // draw the video first
-    ctx.drawImage(video, 0, 0, 300, 200);
+    // ctx.drawImage(video, 0, 0, 300, 200);
   
     prediction.forEach((pred) => {
 
         chrome.storage.local.set({
             'prediction': pred
-          });
+        });
     });
   };
   
