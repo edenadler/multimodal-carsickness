@@ -1,14 +1,18 @@
-function setupCam() {
-  navigator.mediaDevices.getUserMedia({
-    video: true
-  }).then(mediaStream => {
-    document.querySelector('#webcamVideo').srcObject = mediaStream;
-  }).catch((error) => {
-    console.warn(error);
-  });
-}
+let toggle = document.getElementById("checkbox-toggle");
+let slider = document.getElementById("slider-range");
+console.log('popup opened')
 
-setupCam();
+
+toggle.addEventListener("change", function () {
+  console.log('toggle change detected', toggle.checked)
+  chrome.storage.local.set({'toggleChecked': toggle.checked});
+})
+
+slider.addEventListener("change", function () {
+  console.log('slider change detected', slider.value);
+  document.getElementById("rangevalue").innerHTML = slider.value;
+  chrome.storage.local.set({'sliderValue': slider.value});
+})
 
 
 // // Initialize button with user's preferred color

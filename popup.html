@@ -1,10 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="css/button.css">
+    <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <video autoplay="true" id="video" width="227" height ="227"></video>
+    <div style="width: 300px; height: 100%; position: relative;">
+      <div class="input-options">
+        <div class="container">
+          <div class="slider">
+            <div class="input-title">Smoothing</div>
+            <input id="slider-range" type="range" min="0" max="30" onchange="rangevalue.value=value"/>
+            <output id="rangevalue">15</output>
+          </div>
+        </div>
+
+        <div class="toggle-input">
+          <div class="input-title">remove 3d rotation?</div>
+          <label class="switch">
+            <input type="checkbox" id="checkbox-toggle" onchange="toggleResult.value=checked">
+            <span class="slider-toggle round"></span>
+          </label>
+          <output id="toggleResult"></output>
+        </div>
+      </div>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>

@@ -1,6 +1,5 @@
 body {
     color: #aaa;
-    font-family:Monospace;
     font-size:13px;
     text-align:center;
 
@@ -55,18 +54,25 @@ input[type=checkbox] {
 }
 
 
+.input-options {
+  margin: 30px;
+}
 
 /* slider */
 .container {
     width: 200px;
-    height: 50px;
-    margin: auto;
+    /* height: 50px; */
+    margin: 20px auto;
     text-align: center;
 }
   
 .slider {
     width: 100%;
     margin: 20px auto;
+}
+
+.input-title {
+  padding: 20px;
 }
 
 input[type="range"] {

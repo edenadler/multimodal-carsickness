@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener((details) => {
       url: chrome.extension.getURL('welcome.html'),
       active: true
     });
-  });
+});
 
 function setupCamera() {
     navigator.mediaDevices
@@ -29,7 +29,7 @@ function setupCamera() {
             video.srcObject = stream;
         }).catch((error) => {
             console.warn(error);
-          });
+        });
 };
 
 // If cam acecss has already been granted to this extension, setup webcam.
@@ -38,43 +38,76 @@ chrome.storage.local.get('camAccess', items => {
       console.log('cam access already exists');
       setupCamera();
     }
-  });
+});
   
   // If cam acecss gets granted to this extension, setup webcam.
-  chrome.storage.onChanged.addListener((changes, namespace) => {
+chrome.storage.onChanged.addListener((changes, namespace) => {
     if ('camAccess' in changes) {
-      console.log('cam access granted');
-      setupCamera();
+        console.log('cam access granted');
+        setupCamera();
     }
-  });
+});
 
 const detectFaces = async () => {
     // console.log('detectFaces called');
     const prediction = await model.estimateFaces(video, false);
+    let tabId = -1;
 
-    // initialize prediction values if not yet set
-    chrome.storage.local.get('recentPrediction', items => {
-        if (!'recentPrediction' in items) {
-            chrome.storage.local.set({'recentPrediction': pred});
+    // only change for active tab
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    }, (tabs) => {
+        // Find the active tab in the browser.
+        if (tabs.length == 0) {
+          console.log('no active tab');
+          return;
         }
+        tabId = tabs[0].id;
+        
+        // draw the video first
+        // ctx.drawImage(video, 0, 0, 300, 200);
+    
+        prediction.forEach((pred) => {
+            // initialize prediction values if not yet set
+            chrome.storage.local.get('recentPrediction', items => {
+                if (!'recentPrediction' in items) {
+                    chrome.storage.local.set({'recentPrediction': pred});
+                }
+            });
+
+            chrome.storage.local.set({
+                'prediction': pred
+            });
+
+            // Send a message to the active tab indicating which scrolling actions
+            // to start or end.
+            chrome.tabs.sendMessage(tabId, {'prediction': pred});
+        });
     });
     
     // draw the video first
     // ctx.drawImage(video, 0, 0, 300, 200);
   
-    prediction.forEach((pred) => {
+    // prediction.forEach((pred) => {
+    //     // initialize prediction values if not yet set
+    //     chrome.storage.local.get('recentPrediction', items => {
+    //         if (!'recentPrediction' in items) {
+    //             chrome.storage.local.set({'recentPrediction': pred});
+    //         }
+    //     });
 
-        chrome.storage.local.set({
-            'prediction': pred
-        });
-    });
-  };
+    //     chrome.storage.local.set({
+    //         'prediction': pred
+    //     });
+    // });
+};
   
-  setupCamera();
-  video.addEventListener("loadeddata", async () => {
+setupCamera();
+    video.addEventListener("loadeddata", async () => {
     model = await blazeface.load();
-  
+
     // call detect faces every 100 milliseconds or 10 times every second
     setInterval(detectFaces, 100);
-  });
-    
+});
+

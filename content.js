@@ -2,7 +2,7 @@ const targetBody = document.body;
 console.log(targetBody);
 let windowHeight = window.innerHeight;
 let windowWidth = window.innerWidth;
-const SENSITIVITY_LEVEL = 5;
+let SENSITIVITY_LEVEL = 8;
 
 // function shouldUpdateUI(pred) {
 //     let result = false;
@@ -54,6 +54,15 @@ function moveBody(pred) {
     //   pred.landmarks.forEach((landmark) => {
     //     ctx.fillRect(landmark[0], landmark[1], 5, 5);
     //   });
+
+    // allow user to set sensitivity level
+    chrome.storage.local.get('sliderValue', items => {
+        if ('sliderValue' in items) {
+            console.log('slider result', items.sliderValue)
+            SENSITIVITY_LEVEL = items.sliderValue;
+        }
+        
+    });
   
       const midpoint = (width)/2;
       const noseX = pred.landmarks[2][0];
@@ -89,23 +98,41 @@ function moveBody(pred) {
   
       // console.log(perspectiveShift)
       // console.log(pred);
-    //   targetBody.style.height = windowHeight + 'px';
-    //   targetBody.style.width = windowWidth*0.8 - 300 + 'px';
-    //   targetBody.style.right = pred.topLeft[0] + 'px';
+      targetBody.style.position = 'absolute';
+      targetBody.style.height = windowHeight + 'px';
+      targetBody.style.width = windowWidth*0.8 + 'px';
+      targetBody.style.right = pred.topLeft[0] + 'px';
     //   targetBody.style.top = pred.topLeft[1] + 'px';
-        targetBody.style.transition = 'transform 0s ease-in-out';
+      targetBody.style.transition = 'transform 0s ease-in-out';
     
-  console.log(yRotation)
-      if (true) {
-        targetBody.style.transform = 'perspective(' + windowWidth + 'px) rotateY(' + yRotation + 'deg)';
+    console.log(yRotation)
 
-        // targetBody.style.transform = 'translateX(' + pred.topLeft[0] + 'px) translateY(' + pred.topLeft[1] + 'px) perspective(' + windowHeight + 'px) rotateY(' + yRotation + 'deg)';
-        // targetBody.style.transform = 'translateX(' + pred.topLeft[0] + 'px) translateY(' + pred.topLeft[1] + 'px) perspective(' + 400 + 'px) rotateY(' + -10 + 'deg)';
-      } else {
-        targetBody.style.transform = 'perspective(0px) rotateY(0deg)';
-      }
+    // allow user to show and remove 3d rotation animation
+    chrome.storage.local.get('toggleChecked', items => {
+        if ('toggleChecked' in items) {
+            console.log('toggle result', items.toggleChecked)
+            if (items.toggleChecked) {
+                // removes 3d rotation
+                targetBody.style.transform = 'perspective(0px) rotateY(0deg)';
+            } else {
+                targetBody.style.transform = 'perspective(' + windowWidth + 'px) rotateY(' + yRotation + 'deg)';
+        
+                // targetBody.style.transform = 'translateX(' + pred.topLeft[0] + 'px) translateY(' + pred.topLeft[1] + 'px) perspective(' + windowHeight + 'px) rotateY(' + yRotation + 'deg)';
+                // targetBody.style.transform = 'translateX(' + pred.topLeft[0] + 'px) translateY(' + pred.topLeft[1] + 'px) perspective(' + 400 + 'px) rotateY(' + -10 + 'deg)';
+            }
+        }
+        
+    });
 
 };
+
+chrome.runtime.onMessage.addListener((request, sender) => {
+    if ('prediction' in request) {
+        console.log('prediction received', request.prediction);
+          const pred = request.prediction.newValue;
+          moveBody(pred);
+      }
+});
 
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
