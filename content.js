@@ -31,7 +31,6 @@ function moveBody(pred) {
         // if nose position different
         const noseDiff = Math.abs(pred.landmarks[2][0] - recentPrediction.landmarks[2][0]);
         
-        console.log('------------', SENSITIVITY_LEVEL)
         console.log('leftDiff: ' + leftDiff + ' rightDiff: ' + rightDiff + ' noseDiff: ' + noseDiff)
         if (noseDiff < SENSITIVITY_LEVEL || rightDiff < SENSITIVITY_LEVEL || leftDiff < SENSITIVITY_LEVEL) {
             console.log('should NOT update coords');
