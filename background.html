@@ -4,33 +4,8 @@
     </head>
     <body>
         <video id="video" autoplay width="227" height="227"></video>
-        <div style="width: 300px; height: 100%; position: relative;">
-            <canvas id="canvas" width="300px" height="200px"></canvas>
-            <div class="input-options">
-              <div class="container">
-                <div class="slider">
-                  <div>Sensitivity</div>
-                  <input id="slider-range" type="range" min="0" max="100" onchange="rangevalue.value=value"/>
-                  <output id="rangevalue">50</output>
-                </div>
-              </div>
-        
-              <div class="toggle-input">
-                <div>show z axis rotation?</div>
-                <label class="switch">
-                  <input type="checkbox" id="checkbox-toggle" onchange="toggleResult.value=checked">
-                  <span class="slider-toggle round"></span>
-                </label>
-                <output id="toggleResult">false</output>
-              </div>
-            </div>
-          </div>
     </body>
     <script src="lib/tfjs.min.js"></script>
-    <!-- <script src="lib/tf.min.js"></script> -->
     <script src="lib/blazeface.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script> -->
     <script src="background.js"></script>
-
 </html>

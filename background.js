@@ -1,12 +1,9 @@
 let video = document.getElementById("video");
 let model;
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
 let windowHeight = window.innerHeight;
 let windowWidth = window.innerWidth;
-let text = video;
 
-// Gain permission to webcam
+// Get webcam permission
 chrome.runtime.onInstalled.addListener((details) => {
     // if (details.reason.search(/install/g) === -1) {
     //     console.log("not needed")
@@ -49,7 +46,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 });
 
 const detectFaces = async () => {
-    // console.log('detectFaces called');
     const prediction = await model.estimateFaces(video, false);
     let tabId = -1;
 
@@ -64,12 +60,9 @@ const detectFaces = async () => {
           return;
         }
         tabId = tabs[0].id;
-        
-        // draw the video first
-        // ctx.drawImage(video, 0, 0, 300, 200);
     
         prediction.forEach((pred) => {
-            // initialize prediction values if not yet set
+            // initialize prediction values if not yet set - used for reference to prevent jitteriness
             chrome.storage.local.get('recentPrediction', items => {
                 if (!'recentPrediction' in items) {
                     chrome.storage.local.set({'recentPrediction': pred});
@@ -80,31 +73,14 @@ const detectFaces = async () => {
                 'prediction': pred
             });
 
-            // Send a message to the active tab indicating which scrolling actions
-            // to start or end.
+            // Send a message to the active tab with the prediction
             chrome.tabs.sendMessage(tabId, {'prediction': pred});
         });
     });
-    
-    // draw the video first
-    // ctx.drawImage(video, 0, 0, 300, 200);
-  
-    // prediction.forEach((pred) => {
-    //     // initialize prediction values if not yet set
-    //     chrome.storage.local.get('recentPrediction', items => {
-    //         if (!'recentPrediction' in items) {
-    //             chrome.storage.local.set({'recentPrediction': pred});
-    //         }
-    //     });
-
-    //     chrome.storage.local.set({
-    //         'prediction': pred
-    //     });
-    // });
 };
   
 setupCamera();
-    video.addEventListener("loadeddata", async () => {
+video.addEventListener("loadeddata", async () => {
     model = await blazeface.load();
 
     // call detect faces every 100 milliseconds or 10 times every second
